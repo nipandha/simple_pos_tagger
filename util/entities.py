@@ -42,6 +42,11 @@ class Group:
         self.id = name
         self.Arcs=[]
         self.alphabet=[]
+        for i in range(97):
+            e = Emit("*&^$$)@^$")
+            listy = []
+            listy.append(e)
+            self.alphabet.append(listy)
         self.total=0
     def displayCount(self):
         return self.total
@@ -63,19 +68,19 @@ class Group:
     def addEmission(self,word):
         self.total+=1
         added = False
-
-        for emit in self.Emits:
+        alp=self.alphabet[ord(word[0])-33]
+        for emit in alp:
             if emit.isID(word):
-
                 emit.increase()
                 added = True
         if added != True:
             emit = Emit(word)
-            self.Emits.append(emit)
+            alp.append(emit)
         #print(self.id)
         #print(len(self.Emits))
     def findEmissionFreq(self,word):
-        for emit in self.Emits:
+        alp = self.alphabet[ord(word[0]) - 33]
+        for emit in alp:
             if emit.isID(word):
                 return emit.frequency()
         return -1
@@ -120,6 +125,9 @@ class Sentence:
     def printout(self):
         for w in self.words:
             print(w)
+    def printoutp(self):
+        for i in range(len(self.words)):
+            print(self.words[i],self.pos[i],self.prob[i])
 class Corpus:
     Groups=[]
     def __init__(self):
@@ -169,6 +177,7 @@ class Corpus:
         prob = []
         pos = []
         previous=[]
+        print("Finding prob for ",word," with prev ",previous_grp)
         for group in self.Groups:
             if group.isID(previous_grp):
                 previous.append(group)
@@ -181,9 +190,9 @@ class Corpus:
                     p = 1.0 * float(previous[0].find_transition_frequency(group.id))
                 else:
                     p=0.09
-                #print("Found "+group.id, p)
+                print("Found "+group.id, p)
                 p *= (f / group.total)
-                #print(f,group.total,p)
+                print(f,group.total,p)
                 prob.append(p)
                 pos.append(group.id)
         return prob, pos
@@ -192,6 +201,7 @@ class Corpus:
         j=0
 
         for word in sentence.words:
+            print("word is ",word)
             prob = []
             pos = []
             if j==0:
@@ -231,7 +241,7 @@ class Corpus:
                     sen=Sentence()
                     sen.addWord(word,pos[i],prob[i])
                     sentences.append(sen)
-
+                    #print("added ",pos[i]," for ",word)
             else:
 
                 remove=[]
@@ -239,6 +249,8 @@ class Corpus:
                 for sen in sentences:
                     prob = []
                     pos = []
+                    #print("current sen is ")
+                    #sen.printoutp()
                     prob, pos = self.findWordProbabilities(word,sen.lastGroup())
                     if (len(pos) == 0):
                         if((ord(word[0])>=65)and(ord(word[0])<=90)):
@@ -276,6 +288,7 @@ class Corpus:
                         sen1=Sentence()
                         sen1.addSentence(sen)
                         sen1.addWord(word,pos[i],prob[i])
+                        #print("added ", pos[i], " for ", word)
                         adds.append(sen1)
                         #print(len(adds))
                     remove.append(sen)
@@ -287,20 +300,20 @@ class Corpus:
 
                 for r in remove:
                     sentences.remove(r)
-                '''if(len(sentences)>3):
+                if(len(sentences)>3):
                     while(len(sentences)>3):
                         min=2.0
-                        j=-1
+                        k=-1
                         i=0
                         for  sen in sentences:
                             v=sen.totalProbability()
                             if(v<min):
-                                j=i
+                                k=i
                                 min=v
                             i += 1
-                        sen=sentences[j]
+                        sen=sentences[k]
                         sentences.remove(sen)
-                print("New")
+                '''print("New")
                 for s in sentences:
                     s.printout()'''
 
@@ -326,10 +339,11 @@ class Corpus:
                 print(arc.id)
 
                 print(arc.frequency())'''
-            for emit in group.Emits:
-                print(emit.id)
+            '''for a in group.alphabet:
+                for emit in a:
+                    print(emit.id)
 
-                print(emit.frequency())
+                    print(emit.frequency())'''
 
 
 
